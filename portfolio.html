@@ -285,6 +285,22 @@
   .gallery__row--full{
     grid-template-columns: 1fr;
   }
+  /* Single vertical photo centered */
+.gallery__row--single {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.gallery__row--single .gallery__figure {
+  grid-column: 1 / -1;
+  width: calc(50% - 6px);
+  justify-self: center;
+}
+
+.gallery__row--single img {
+  width: 100%;
+  height: auto;
+}
 
   .gallery__figure{
     cursor: pointer;
