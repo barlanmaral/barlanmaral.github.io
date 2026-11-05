@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Barlan Maral</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@400;500&family=Gothic+A1:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================
+     DESIGN TOKENS (shared across pages)
+     ============================ */
+  :root{
+    --color-bg: #1a1a1a;
+    --color-surface: #333333;
+    --color-surface-translucent: rgba(51, 51, 51, 0.8);
+    --color-button-bg: #3b3a3a;
+    --color-white: #ffffff;
+    --color-muted: #b7b7b7;
+
+    --font-display: 'Abhaya Libre', Georgia, serif;
+    --font-heading: 'Gothic A1', 'Segoe UI', sans-serif;
+    --font-body: 'Century Gothic', 'Century Gothic MVB', 'Questrial', sans-serif;
+
+    --fs-display-lg: 32px;
+    --fs-display-md: 20px;
+    --fs-body: 12px;
+    --fs-caption: 8px;
+
+    --ls-tight: 2px;
+    --ls-wide: 3px;
+    --ls-widest: 4px;
+
+    --space-2xs: 4px;
+    --space-xs: 8px;
+    --space-sm: 12px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+
+    --radius-md: 12px;
+    --radius-round: 100px;
+
+    --shadow-outer: 0px 0px 24px 0px rgba(180, 188, 203, 0.24);
+
+    --page-max-width: 430px;
+    --footer-height: 84px;
+  }
+
+  /* ============================
+     ENTRANCE / SCROLL REVEAL ANIMATIONS
+     ============================ */
+  @keyframes fadeInUp{
+    from{ opacity: 0; transform: translateY(18px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
+
+  .navbar__brand{
+    opacity: 0;
+    animation: fadeInUp 0.9s ease forwards;
+    animation-delay: 0.15s;
+  }
+
+  .reveal{
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .reveal.is-visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .contact__avatar.reveal{ transition-delay: 0.1s; }
+  .contact__links.reveal{ transition-delay: 0.2s; }
+  .contact__actions.reveal{ transition-delay: 0.3s; }
+
+  @media (prefers-reduced-motion: reduce){
+    .navbar__brand{
+      animation: none;
+      opacity: 1;
+    }
+
+    .reveal{
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
+  /* ============================
+     RESET
+     ============================ */
+  *, *::before, *::after{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html{ -webkit-text-size-adjust: 100%; }
+
+  body{
+    background: #0d0d0d;
+    color: var(--color-white);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  img{ display: block; max-width: 100%; }
+
+  button{
+    font-family: inherit;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: inherit;
+  }
+
+  a{ color: inherit; text-decoration: none; }
+  ul{ list-style: none; }
+
+  /* ============================
+     PAGE SHELL
+     ============================ */
+  .page{
+    position: relative;
+    max-width: var(--page-max-width);
+    min-height: 932px;
+    margin: 0 auto;
+    background: var(--color-bg);
+    box-shadow: var(--shadow-outer);
+    overflow: hidden;
+    padding-bottom: var(--footer-height);
+  }
+
+  /* ============================
+     NAVBAR
+     ============================ */
+  .navbar{
+    position: absolute;
+    top: 44px;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 16px 12px 16px;
+  }
+
+  .navbar__brand{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .navbar__title{
+    font-family: var(--font-display);
+    font-size: var(--fs-display-lg);
+    line-height: 23px;
+    letter-spacing: var(--ls-widest);
+    color: var(--color-white);
+    font-weight: 400;
+  }
+
+  .navbar__subtitle{
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: 13px;
+    letter-spacing: var(--ls-wide);
+    color: var(--color-muted);
+    margin-top: 4px;
+  }
+
+  .navbar__toggle{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+  }
+
+  .navbar__toggle img{ width: 20px; height: 20px; }
+
+  .navbar__nav{
+    position: absolute;
+    top: 100%;
+    right: 16px;
+    left: 16px;
+    background: var(--color-surface-translucent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius-md);
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.3s ease, padding 0.35s ease;
+  }
+
+  .navbar__nav.is-open{
+    max-height: 320px;
+    opacity: 1;
+    padding: var(--space-sm) 0;
+  }
+
+  .navbar__list{ display: flex; flex-direction: column; }
+
+  .navbar__link{
+    display: block;
+    padding: var(--space-sm) var(--space-md);
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--color-white);
+  }
+
+  .navbar__link:hover,
+  .navbar__link:focus-visible{ color: var(--color-muted); }
+
+  .navbar__link.is-current{ color: var(--color-muted); }
+
+  @media (min-width: 1025px){
+    .navbar__toggle{ display: none; }
+
+    .navbar__nav{
+      position: static;
+      max-height: none;
+      opacity: 1;
+      overflow: visible;
+      background: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    .navbar__list{ flex-direction: row; gap: var(--space-lg); }
+    .navbar__link{ padding: var(--space-2xs) 0; }
+  }
+
+  /* ============================
+     CONTACT CONTENT
+     ============================ */
+  .contact{
+    padding: 160px var(--space-lg) 60px;
+    text-align: center;
+  }
+
+  .contact__title{
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-display-md);
+    line-height: 16px;
+    letter-spacing: var(--ls-widest);
+    color: var(--color-white);
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .contact__avatar{
+    width: 72px;
+    height: 72px;
+    margin: 61px auto 0;
+    border-radius: 11px;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .contact__avatar img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .contact__links{
+    margin-top: 44px;
+  }
+
+  .contact__email{
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: 13px;
+    color: var(--color-muted);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .contact__phone{
+    margin-top: 6px;
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: 13px;
+    color: var(--color-muted);
+  }
+
+  .contact__actions{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    margin-top: 15px;
+  }
+
+  .contact__btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 206px;
+    padding: 12px var(--space-xl);
+    background: var(--color-button-bg);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    letter-spacing: var(--ls-wide);
+    color: var(--color-white);
+  }
+
+  .contact__btn:hover,
+  .contact__btn:focus-visible{
+    background: #4a4949;
+  }
+
+  /* ============================
+     FOOTER
+     ============================ */
+  .footer{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    height: var(--footer-height);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-md);
+    background: var(--color-surface-translucent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .footer__info{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1 1 0%;
+    min-width: 0;
+  }
+
+  .footer__name{
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-display-md);
+    line-height: 16px;
+    letter-spacing: var(--ls-tight);
+    color: var(--color-white);
+    text-transform: capitalize;
+  }
+
+  .footer__label{
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    line-height: 13px;
+    letter-spacing: var(--ls-wide);
+    color: var(--color-muted);
+  }
+
+  .footer__email{
+    font-family: var(--font-body);
+    font-size: var(--fs-caption);
+    line-height: 13px;
+    letter-spacing: var(--ls-wide);
+    color: var(--color-muted);
+    width: 100%;
+    order: 3;
+  }
+
+  .footer__social{
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    order: 2;
+  }
+
+  .icon-btn{
+    width: 22px;
+    height: 22px;
+    border-radius: var(--radius-round);
+    background: var(--color-surface);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .icon-btn svg{
+    width: 12px;
+    height: 12px;
+    stroke: var(--color-white);
+    fill: none;
+  }
+
+  /* ============================
+     LIGHTBOX (single avatar photo)
+     ============================ */
+  .lightbox{
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(13, 13, 13, 0.96);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+  }
+
+  .lightbox.is-open{
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .lightbox__stage{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 32px;
+  }
+
+  .lightbox__img{
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    opacity: 0;
+    transform: scale(0.98);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .lightbox__img.is-visible{
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .lightbox__close{
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-round);
+    background: rgba(51, 51, 51, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    color: var(--color-white);
+  }
+
+  .lightbox__close svg{
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+  }
+
+  /* ============================
+     RESPONSIVE
+     ============================ */
+  @media (max-width: 768px){
+    .page{ max-width: 100%; }
+  }
+
+  @media (min-width: 1025px){
+    .page{ max-width: 430px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- NAVIGATION -->
+  <header class="navbar">
+    <div class="navbar__brand">
+      <p class="navbar__title">Barlan Maral</p>
+      <p class="navbar__subtitle">photographer</p>
+    </div>
+
+    <nav class="navbar__nav" id="navMenu">
+      <ul class="navbar__list">
+        <li><a class="navbar__link" href="index.html#top">Home</a></li>
+        <li><a class="navbar__link" href="about.html">About me</a></li>
+        <li><a class="navbar__link" href="portfolio.html">Portfolio</a></li>
+        <li><a class="navbar__link is-current" href="contact.html" aria-current="page">Contact</a></li>
+      </ul>
+    </nav>
+
+    <button type="button" class="navbar__toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Toggle navigation menu">
+      <img src="https://www.figma.com/api/mcp/asset/3538778f-6fca-42d3-ba5a-b42f584c05b9.svg" alt="">
+    </button>
+  </header>
+
+  <main>
+
+    <!-- CONTACT -->
+    <section class="contact" id="top" aria-label="Contact">
+      <h1 class="contact__title reveal">Ready to create something meaningful together?</h1>
+
+      <div class="contact__avatar reveal" id="avatarTrigger" role="button" tabindex="0" aria-label="Open photo of Barlan Maral">
+        <img src="https://www.figma.com/api/mcp/asset/c4a7fdff-596c-476b-9d03-3a2574b948b6.png" alt="Barlan Maral headshot" id="avatarImg">
+      </div>
+
+      <div class="contact__links reveal">
+        <a class="contact__email" href="mailto:barlanakma@gmail.com" target="_blank">barlanakma@gmail.com</a>
+        <p class="contact__phone">+7 776 777 2003</p>
+      </div>
+
+      <div class="contact__actions reveal">
+        <a class="contact__btn" href="https://wa.me/77767772003" target="_blank" rel="noopener">WhatsApp</a>
+        <a class="contact__btn" href="https://www.instagram.com/archifute" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer__info">
+      <p class="footer__name">Barlan Maral</p>
+      <p class="footer__label">photographer</p>
+    </div>
+
+    <div class="footer__social">
+      <a class="icon-btn" href="https://wa.me/77767772003" target="_blank" rel="noopener" aria-label="Message on WhatsApp">
+        <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      </a>
+      <a class="icon-btn" href="https://www.instagram.com/archifute" target="_blank" rel="noopener" aria-label="Follow on Instagram">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="18" height="18" rx="5" ry="5" stroke="currentColor" stroke-width="2"/>
+          <path d="M16 11.37a4 4 0 1 1-7.914 1.174A4 4 0 0 1 16 11.37z" stroke="currentColor" stroke-width="2"/>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </a>
+    </div>
+
+    <p class="footer__email">barlanakma@gmail.com</p>
+  </footer>
+
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <div class="lightbox__stage">
+    <img class="lightbox__img" id="lightboxImg" src="" alt="">
+    <button type="button" class="lightbox__close" id="lightboxClose" aria-label="Close photo viewer">
+      <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var toggle = document.getElementById('navToggle');
+    var menu = document.getElementById('navMenu');
+
+    if (!toggle || !menu) return;
+
+    toggle.addEventListener('click', function () {
+      var isOpen = menu.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    menu.querySelectorAll('.navbar__link').forEach(function (link) {
+      link.addEventListener('click', function () {
+        menu.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  })();
+
+  (function () {
+    var revealEls = document.querySelectorAll('.reveal');
+    if (!revealEls.length) return;
+
+    var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+      revealEls.forEach(function (el) { el.classList.add('is-visible'); });
+      return;
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+    revealEls.forEach(function (el) { observer.observe(el); });
+  })();
+
+  /* Simple lightbox for the avatar photo */
+  (function () {
+    var trigger = document.getElementById('avatarTrigger');
+    var avatarImg = document.getElementById('avatarImg');
+    var lightbox = document.getElementById('lightbox');
+    var lightboxImg = document.getElementById('lightboxImg');
+    var closeBtn = document.getElementById('lightboxClose');
+
+    if (!trigger || !lightbox) return;
+
+    function open() {
+      lightboxImg.classList.remove('is-visible');
+      lightboxImg.setAttribute('src', avatarImg.getAttribute('src'));
+      lightboxImg.setAttribute('alt', avatarImg.getAttribute('alt'));
+      window.setTimeout(function () { lightboxImg.classList.add('is-visible'); }, 30);
+      lightbox.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function close() {
+      lightbox.classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+
+    trigger.addEventListener('click', open);
+    trigger.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        open();
+      }
+    });
+
+    closeBtn.addEventListener('click', close);
+    lightbox.addEventListener('click', function (e) {
+      if (e.target === lightbox) close();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && lightbox.classList.contains('is-open')) close();
+    });
+  })();
+</script>
+
+</body>
+</html>
